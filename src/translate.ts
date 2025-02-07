@@ -161,7 +161,7 @@ async function chat(
     return text;
   } catch (error) {
     log.error(`Error: ${error.message}`);
-    log.error(`Error: ${error}`);
+    log.error(`Error: ${error.cause}`);
     throw error
   }
 }
