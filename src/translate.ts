@@ -1,6 +1,8 @@
 import log from "loglevel";
 // const log = console
-import axios from "axios";
+// import axios from "axios";
+import { createOpenAI } from "@ai-sdk/openai"
+import { generateText } from "ai";
 import { systemPrompt, chinesePrompt } from "./prompts";
 import { CsvTextInfo, toCsvText, jsonTextToCsvText, extractInfoFromCsvText, } from "./csv"
 
@@ -14,7 +16,7 @@ export interface LLMConfig {
   apiKey: string;
   baseURL: string;
   model: string;
-  max_tokens: number;
+  maxTokens: number;
 }
 
 function splitCsvInfo(csvTextInfo: CsvTextInfo, batchNum: number){
@@ -126,44 +128,40 @@ async function chat(
     apiKey,
     baseURL,
     model,
-    max_tokens,
+    maxTokens,
   }: LLMConfig
 ) {
   try {
-    const openai = axios.create({
+    const openai = createOpenAI({
       baseURL,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
+      apiKey,
     });
     log.info(`Sending request to ${model} API, please wait...`);
-    const response = await openai.post(
-      "/v1/chat/completions",
-      {
-        model,
-        messages: [
-          { role: "system", content: chinesePrompt },
-          // { 'role': 'user', content: exampleInput },
-          // {'role': 'assistant', content: exampleOutput},
-          { role: "user", content: userInput },
-        ],
-        temperature: 0.7,
-        max_tokens,
+    const { text, usage, reasoning } = await generateText({
+      model: openai(model),
+      messages: [
+        { role: "system", content: chinesePrompt },
+        // { 'role': 'user', content: exampleInput },
+        // {'role': 'assistant', content: exampleOutput},
+        { role: "user", content: userInput },
+      ],
+      temperature: 0.7,
+      maxTokens: maxTokens,
+      providerOptions: {
+        openai: {
+          reasoningEffort: 'low',
+        },
       },
-      {
-        timeout: 180000,
-      }
-    );
+    })
 
-    const generatedText = response.data.choices[0].message.content;
-    const tokenConsumed = response.data.usage.total_tokens;
-    log.debug(`Generated Text: ${generatedText}`);
+    const tokenConsumed = usage.totalTokens;
+    log.debug(`Reasoning Content: ${reasoning}`)
+    log.debug(`Generated Text: ${text}`);
     log.debug(`Consumed token: ${tokenConsumed}`);
-    return generatedText;
+    return text;
   } catch (error) {
     log.error(`Error: ${error.message}`);
-    log.error(`Error: ${error.response.data.error.message}`);
-    throw new Error(error.response.data.error.message);
+    log.error(`Error: ${error}`);
+    throw error
   }
 }

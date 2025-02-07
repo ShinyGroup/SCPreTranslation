@@ -15,14 +15,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
-    - name: Use pnpm
-      uses: pnpm/action-setup@v3
-      with:
-        version: 8
     - name: Install dependencies
-      run: pnpm install
+      run: yarn
     - name: Deploy story
-      run: pnpm deploy:csv
+      run: yarn deploy:csv
     - name: Deploy to GitHub Pages
       if: success()
       uses: crazy-max/ghaction-github-pages@v3
