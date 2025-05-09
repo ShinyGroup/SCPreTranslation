@@ -32,5 +32,6 @@
     "translate:latest": "ts-node ./scripts/translate.ts --type remote-diff",
     "move": "ts-node ./scripts/moveTranslated.ts",
     "deploy:csv": "ts-node ./scripts/deployCSV.ts"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
