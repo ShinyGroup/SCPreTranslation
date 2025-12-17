@@ -33,7 +33,7 @@ export function getLLMConfig() {
     apiKey: process.env.OPENAI_API_KEY,
     baseURL: process.env.OPENAI_BASE_URL,
     model: process.env.MODEL,
-    maxTokens: Number(process.env.MAX_TOKENS),
+    maxOutputTokens: Number(process.env.MAX_TOKENS),
   };
 }
 

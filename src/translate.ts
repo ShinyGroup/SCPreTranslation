@@ -16,7 +16,7 @@ export interface LLMConfig {
   apiKey: string;
   baseURL: string;
   model: string;
-  maxTokens: number;
+  maxOutputTokens: number;
 }
 
 function splitCsvInfo(csvTextInfo: CsvTextInfo, batchNum: number){
@@ -128,7 +128,7 @@ async function chat(
     apiKey,
     baseURL,
     model,
-    maxTokens,
+    maxOutputTokens,
   }: LLMConfig
 ) {
   try {
@@ -146,7 +146,7 @@ async function chat(
         { role: "user", content: userInput },
       ],
       temperature: 0.7,
-      maxTokens: maxTokens,
+      maxOutputTokens,
       providerOptions: {
         openai: {
           reasoningEffort: 'low',
